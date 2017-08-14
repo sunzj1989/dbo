@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//ibatis.apache.org//DTD Config 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-config.dtd">
+
+<configuration>
+	<!-- 进行mybatis 配置 -->
+	<typeAliases>
+		<!-- 为类型 起了别名 -->
+		<typeAlias type="com.msunsoft.utils.PageInfo" alias="PageInfo" />
+
+		<!-- <typeAlias type="com.msunsoft.model.OrganizationHospital" alias="OrganizationHospital" 
+			/> -->
+	</typeAliases>
+
+	<!-- 引入自定义 mapper 文件 -->
+	<mappers>
+		<mapper resource="config/mybatis/BookMapper.xml" />
+		<mapper resource="config/mybatis/UserMapper.xml" />
+		<mapper resource="config/mybatis/ChaptersMapper.xml" />
+		<mapper resource="config/mybatis/ItemsMapper.xml" />
+		<mapper resource="config/mybatis/ChapterSubItemsMapper.xml" />
+		<mapper resource="config/mybatis/ContentMapper.xml" />
+		<mapper resource="config/mybatis/ImgsMapper.xml" />
+	</mappers>
+</configuration> 

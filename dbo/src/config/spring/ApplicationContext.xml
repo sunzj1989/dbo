@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx.xsd">
+        
+	<!-- 在spring中使用annotation来注册bean -->
+	<context:component-scan base-package="com.msunsoft">
+	     <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+	<context:component-scan base-package="com.msunsoft.service"/>
+	<!-- 
+	<import resource="ApplicationContext-service.xml" /> -->
+	
+	
+	<!-- 配置连接池 -->
+    <context:property-placeholder location="classpath:config/spring/jdbc.properties"/>
+    
+    <bean name="pinfo" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+     	<property name="url" value="${pinfo_driverUrl}" />
+     	<property name="driverClassName" value="${driverClassName}"></property>
+        <property name="username" value="${pinfo_username}" />
+        <property name="password" value="${pinfo_password}" />   
+ 	</bean>
+
+  
+    <bean name="mb" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+     	<property name="url" value="${pinfo_driverUrl}" />
+     	<property name="driverClassName" value="${driverClassName}"></property>
+        <property name="username" value="${pinfo_username}" />
+        <property name="password" value="${pinfo_password}" />   
+ 	</bean>
+
+     
+    <bean id="dataSource" class="com.msunsoft.datasource.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="pinfo" value-ref="pinfo" />
+                <entry key="mb" value-ref="mb" />
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="pinfo" />
+    </bean>
+
+
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="configLocation" value="classpath:config/mybatis/config.xml" />
+	</bean>
+
+
+	<!-- 扫描 basePackage下所有的接口，根据对应的mapper.xml为其生成代理类 -->
+	<bean id="mapperScannerConfigurer"  class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.msunsoft.mapper" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" /> -->
+	
+	 <!-- 事务管理 属性 -->
+    <tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="find*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="edit*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+	<aop:config>
+		<aop:advisor advice-ref="transactionAdvice" pointcut="execution(* com.msunsoft..service.*.*(..))" order="2"/>
+		<aop:aspect ref="dataSourceAspect" order="1">
+		    <aop:before method="changeDateSource" pointcut="@annotation(com.msunsoft.annotation.DataSource)"/>
+		</aop:aspect>
+	</aop:config>
+	
+</beans>				

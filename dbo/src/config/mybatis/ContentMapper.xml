@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.msunsoft.mapper.ContentMapper">
+    <resultMap id="BaseResultMap" type="com.msunsoft.model.Content">
+        <id column="content_id" property="content_id" jdbcType="INTEGER"/>
+        <result column="item_id" property="item_id" jdbcType="INTEGER"/>
+        <result column="detail_content" property="detail_content" jdbcType="VARCHAR"/>
+    </resultMap>
+	<resultMap id="ExtendResultMap" type="com.msunsoft.utils.ContentVo">
+        <id column="item_id" property="item_id" jdbcType="INTEGER"/>
+        <result column="t_name" property="t_name" jdbcType="VARCHAR"/>
+         <result column="detail_content" property="detail_content" jdbcType="VARCHAR"/>
+         <result column="sql" property="sql" jdbcType="VARCHAR"/>
+    </resultMap>
+  <sql id="Base_Column_List">
+    content_id,item_id, detail_content
+  </sql>
+
+    <select id="findContentById" resultMap="BaseResultMap" parameterType="com.msunsoft.utils.ContentVo">
+        select
+        <include refid="Base_Column_List"/>
+        from ${t_name}
+        where item_id = #{item_id,jdbcType=INTEGER}
+    </select>
+     <select id="findContentAll" resultMap="BaseResultMap" parameterType="com.msunsoft.utils.ContentVo">
+        select
+        <include refid="Base_Column_List"/>
+        from ${t_name}
+    </select>
+    <insert id="addContent" parameterType="com.msunsoft.utils.ContentVo">
+        insert into ${t_name} 
+        (content_id,item_id, detail_content) 
+        values 
+        (${sql},
+        #{item_id,jdbcType=INTEGER},
+       #{detail_content,jdbcType=VARCHAR})
+    </insert> 
+    
+   <delete id="deleteContent" parameterType="com.msunsoft.utils.ContentVo">
+    	delete from ${t_name} where item_id  = #{item_id ,jdbcType=INTEGER}
+    </delete>
+     <update id="updateContent" parameterType="com.msunsoft.utils.ContentVo">
+        update ${t_name}
+        <set>
+            detail_content=#{detail_content,jdbcType=VARCHAR}
+        </set>
+        where item_id = #{item_id,jdbcType=INTEGER}
+    </update>
+</mapper>

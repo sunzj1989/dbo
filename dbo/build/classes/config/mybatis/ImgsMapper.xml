@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.msunsoft.mapper.ImagesMapper">
+    <resultMap id="BaseResultMap" type="com.msunsoft.model.Images">
+        <id column="image_id" property="image_id" jdbcType="INTEGER"/>
+        <result column="chapter_sub_item_id" property="chapter_sub_item_id" jdbcType="INTEGER"/>
+        <result column="image" property="image" jdbcType="BLOB"/>
+    	 <result column="image_explain" property="image_explain" jdbcType="VARCHAR"/>
+        <result column="flag_invalid" property="flag_invalid" jdbcType="CHAR"/>
+    </resultMap>
+    <resultMap id="ExtendResultMap" type="com.msunsoft.utils.PhotoEntity">
+        <id column="image_id" property="image_id" jdbcType="INTEGER"/>
+        <result column="chapter_sub_item_id" property="chapter_sub_item_id" jdbcType="INTEGER"/>
+        <result column="image" property="image" jdbcType="BLOB"/>
+    	 <result column="image_explain" property="image_explain" jdbcType="VARCHAR"/>
+        <result column="flag_invalid" property="flag_invalid" jdbcType="CHAR"/>
+        <result column="t_name" property="t_name" jdbcType="VARCHAR"/>
+        <result column="sql" property="sql" jdbcType="VARCHAR"/>
+    </resultMap>
+  <sql id="Base_Column_List">
+    image_id,chapter_sub_item_id, image,image_explain,flag_invalid
+  </sql>
+
+    <select id="findImgsBySubId" resultMap="ExtendResultMap" parameterType="com.msunsoft.utils.PhotoEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from ${t_name}
+        where chapter_sub_item_id = #{chapter_sub_item_id,jdbcType=INTEGER} order by image_id
+    </select>
+    <select id="findImgsById" resultMap="BaseResultMap" parameterType="com.msunsoft.utils.PhotoEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from ${t_name}
+        where image_id =  #{image_id,jdbcType=INTEGER}
+    </select>
+     <select id="findImgsAll" resultMap="BaseResultMap" parameterType="com.msunsoft.utils.PhotoEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from ${t_name} order by image_id
+    </select>
+     <insert id="addImg" parameterType="com.msunsoft.utils.PhotoEntity">
+        insert into ${t_name} 
+        (image_id,chapter_sub_item_id, image,image_explain,flag_invalid) 
+        values 
+        (${sql},
+        #{chapter_sub_item_id,jdbcType=INTEGER},
+        #{image,jdbcType=BLOB},
+        #{image_explain,jdbcType=VARCHAR},
+        '0')
+    </insert> 
+    
+   <delete id="deleteImg" parameterType="com.msunsoft.utils.PhotoEntity">
+    	delete from ${t_name} where chapter_sub_item_id  = #{chapter_sub_item_id ,jdbcType=INTEGER}
+   </delete>
+</mapper>

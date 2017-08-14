@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc 
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    
+	<!-- 在spring中使用annotation来注册bean-->
+	<context:component-scan base-package="com.msunsoft" />
+
+	<!-- 启用CGliB -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    
+    
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="order" value="10"></property>
+  		<property name="prefix" value="/jsp" /> 
+  		<property name="suffix" value=".jsp" />
+  	</bean>
+  	
+    <!-- 配置哪些是静态资源，缺省Servlet直接返回 -->
+    <mvc:resources location="/static/" mapping="/static/**"/>
+    <mvc:resources location="/images/" mapping="/images/**"/>
+    <mvc:resources location="/scripts/" mapping="/scripts/**"/>
+    <mvc:resources location="/styles/" mapping="/styles/**"/>
+	
+     <!-- 启用spring mvc 注解-->  
+    <mvc:annotation-driven>  
+        <!-- 启动JSON格式的配置 -->  
+        <mvc:message-converters>    
+        <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+            <property name="supportedMediaTypes">    
+                <list>    
+                    <value>text/html;charset=UTF-8</value>  <!-- 避免IE出现下载JSON文件的情况 -->  
+                </list>    
+            </property>      
+        </bean>    
+        </mvc:message-converters>  
+    </mvc:annotation-driven> 
+    
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**/loginByCardCode.*"/>
+			<bean class="msun.server.interceptor.LoginHandlerInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+	
+	
+    <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->  
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <property name="defaultEncoding" value="UTF-8"/>  
+        <!-- 指定所上传文件的总大小不能超过200KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->  
+        <property name="maxUploadSize" value="20000000000"/>  
+    </bean>  
+    
+    <bean id="exceptionResolver" class="com.msunsoft.exception.ServiceException"></bean>
+</beans>

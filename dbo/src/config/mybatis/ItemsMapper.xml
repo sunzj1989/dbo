@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.msunsoft.mapper.ItemsMapper">
+
+	<resultMap type="com.msunsoft.model.Items" id="BaseResultMap">
+		 <id column="items_id" property="items_id" jdbcType="INTEGER"/>
+        <result column="chapter_id" property="chapter_id" jdbcType="INTEGER"/>
+        <result column="chapter_sub_item_id" property="chapter_sub_item_id" jdbcType="INTEGER"/>
+        <result column="items_name" property="items_name" jdbcType="VARCHAR"/>
+        <result column="flag_invalid" property="flag_invalid" jdbcType="CHAR"/>
+	</resultMap>
+	 <sql id="Base_Column_List">
+    	items_id,chapter_id, chapter_sub_item_id, items_name, flag_invalid
+    </sql>
+	<!-- 根据一级标题id查询二级标题 -->
+    <select id="findItemBySubId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from items 
+        where
+        chapter_sub_item_id = #{chapter_sub_item_id,jdbcType=INTEGER} order by items_id
+    </select>
+    <!-- 根据章节所对应标题表的id查询二级标题 -->
+    <select id="findItemBychapterId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from items 
+        where
+        chapter_sub_item_id = #{chapter_sub_item_id,jdbcType=INTEGER} order by items_id
+    </select>
+     <select id="findItemByItem" resultMap="BaseResultMap" parameterType="com.msunsoft.model.Items">
+        select  
+         <include refid="Base_Column_List"/>
+        from items 
+        where
+        items_id = #{items_id,jdbcType=INTEGER} and items_name = #{items_name,jdbcType=VARCHAR}
+    </select>
+	 <insert id="addItems" parameterType="com.msunsoft.model.Items">
+        insert into items (items_id,chapter_id, chapter_sub_item_id, items_name, flag_invalid) 
+        values ((select max(items_id) from ITEMS)+1,#{chapter_id,jdbcType=INTEGER},
+        #{chapter_sub_item_id,jdbcType=INTEGER},#{items_name,jdbcType=VARCHAR},'0')
+    </insert> 
+    
+   <delete id="deleteItems" parameterType="java.lang.Integer">
+    	delete from items where items_id  = #{items_id ,jdbcType=INTEGER}
+    </delete>
+     <delete id="deleteItemsBySubId" parameterType="java.lang.Integer">
+    	delete from items where chapter_sub_item_id  = #{chapter_sub_item_id ,jdbcType=INTEGER}
+    </delete>
+</mapper>

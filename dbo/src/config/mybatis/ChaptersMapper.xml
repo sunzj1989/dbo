@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.msunsoft.mapper.ChaptersMapper">
+    <resultMap id="BaseResultMap" type="com.msunsoft.model.Chapters">
+        <id column="chapter_id" property="chapter_id" jdbcType="INTEGER"/>
+        <id column="book_id" property="book_id" jdbcType="INTEGER"/>
+        <result column="chapter_name" property="chapter_name" jdbcType="VARCHAR"/>
+        <result column="flag_invalid" property="flag_invalid" jdbcType="CHAR"/>
+ 		<result column="flag_parent" property="flag_parent" jdbcType="CHAR"/>
+ 		<result column="parent_id" property="parent_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+  <sql id="Base_Column_List">
+    chapter_id,book_id, chapter_name, flag_invalid, flag_parent, parent_id
+  </sql>
+
+    <select id="findChaptersById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from chapters
+        where chapter_id = #{chapter_id,jdbcType=INTEGER}
+    </select>
+    <select id="findChaptersAllByBookid"  resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from chapters where book_id=#{0}
+         and parent_id = #{1} order by chapter_id
+    </select>
+    <!-- 查询所有父菜单 -->
+    <select id="findByBidAndPid" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from chapters
+        where book_id=#{book_id,jdbcType=INTEGER} and parent_id='-1' order by chapter_id
+    </select>
+</mapper>

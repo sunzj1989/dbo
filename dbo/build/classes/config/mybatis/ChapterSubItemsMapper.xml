@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.msunsoft.mapper.ChapterSubItemsMapper">
+	<resultMap type="com.msunsoft.model.ChapterSubItems" id="BaseResultMap">
+		 <id column="chapter_sub_item_id" property="chapter_sub_item_id" jdbcType="INTEGER"/>
+        <result column="chapter_id" property="chapter_id" jdbcType="INTEGER"/>
+        <result column="chapter_sub_item_name" property="chapter_sub_item_name" jdbcType="VARCHAR"/>
+        <result column="flag_invalid" property="flag_invalid" jdbcType="CHAR"/>
+        <result column="falg_chapter" property="falg_chapter" jdbcType="CHAR"/>        
+        <result column="parent_id" property="parent_id" jdbcType="INTEGER"/>
+	</resultMap>
+	 <sql id="Base_Column_List">
+    	chapter_sub_item_id,chapter_id, chapter_sub_item_name, flag_invalid, flag_chapter,parent_id
+    </sql>
+    <!-- 根据id查询标题 -->
+    <select id="findSubById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_sub_item_id = #{chapter_sub_item_id,jdbcType=INTEGER} 
+    </select>
+	<!-- 根据章节id查询一级标题 -->
+    <select id="findSubByChapterId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_id = #{chapter_id,jdbcType=INTEGER} and parent_id =#{chapter_id,jdbcType=INTEGER} order by chapter_sub_item_id
+    </select>
+   <!-- 根据病种id查询二级小病种 -->
+    <select id="findSecondSubBySubId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_id = #{0} and parent_id =#{1} order by chapter_sub_item_id
+    </select>
+    <select id="findSubEqualsChapter" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+         <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_id = #{chapter_id,jdbcType=INTEGER} and chapter_sub_item_id = #{chapter_id,jdbcType=INTEGER} 
+    </select>
+
+    <select id="findSubIdByChapterId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select  
+        <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_id = #{chapter_id,jdbcType=INTEGER} and parent_id != #{chapter_id,jdbcType=INTEGER}
+    </select>
+     <select id="findSubBySub" resultMap="BaseResultMap" parameterType="com.msunsoft.model.ChapterSubItems">
+        select  
+         <include refid="Base_Column_List"/>
+        from chapter_sub_items 
+        where
+        chapter_sub_item_id = #{chapter_sub_item_id,jdbcType=INTEGER} and chapter_sub_item_name= #{chapter_sub_item_name,jdbcType=INTEGER}
+    </select>
+	 <insert id="addSub" parameterType="com.msunsoft.model.ChapterSubItems">
+        insert into chapter_sub_items (chapter_sub_item_id,chapter_id, chapter_sub_item_name, flag_invalid,flag_chapter, parent_id) 
+        values ((select max(chapter_sub_item_id) from chapter_sub_items)+1,
+        #{chapter_id,jdbcType=INTEGER},
+        #{chapter_sub_item_name,jdbcType=VARCHAR},'0','0',
+         #{chapter_id,jdbcType=INTEGER}
+        )
+    </insert> 
+     <insert id="addsecondSub" parameterType="com.msunsoft.model.ChapterSubItems">
+        insert into chapter_sub_items (chapter_sub_item_id,chapter_id, chapter_sub_item_name, flag_invalid,flag_chapter, parent_id) 
+        values ((select max(chapter_sub_item_id) from chapter_sub_items)+1,
+        #{chapter_id,jdbcType=INTEGER},
+        #{chapter_sub_item_name,jdbcType=VARCHAR},'0','0',
+         #{parent_id,jdbcType=INTEGER}
+        )
+    </insert> 
+   <delete id="deleteSub" parameterType="java.lang.Integer">
+    	delete from chapter_sub_items where chapter_sub_item_id  = #{chapter_sub_item_id ,jdbcType=INTEGER}
+    </delete>
+</mapper>
